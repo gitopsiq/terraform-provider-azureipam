@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # WORK IN PROGRESS - Azure IPAM Terraform Provider
 
 This is a Terraform provider for Azure IP Address Management (IPAM). It allows you to manage IP address spaces, blocks, and reservations using Terraform.
@@ -54,7 +53,3 @@ In order to run the full suite of Acceptance tests, run `make testacc`.
 ```sh
 $ make testacc
 ```
-=======
-# terraform-provider-azureipam
-Terraform provider for Azure IP Address Management (IPAM). Enables infrastructure-as-code management of IP spaces, blocks, and reservations in Azure environments.
->>>>>>> origin/main
