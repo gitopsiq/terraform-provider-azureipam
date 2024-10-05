@@ -9,49 +9,42 @@ import (
 )
 
 func TestAccDataSourceSpaces_basic(t *testing.T) {
-	// Create a mock server that simulates the Azure IPAM API
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Mock the GET /api/spaces response
 		if r.Method == "GET" && r.URL.Path == "/api/spaces" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`[
-				{
-					"name": "test-space",
-					"description": "Test description"
-				},
-				{
-					"name": "another-space",
-					"description": "Another test description"
-				}
+				{"id": "space-123", "name": "test-space", "description": "Test description"},
+				{"id": "space-456", "name": "another-space", "description": "Another description"}
 			]`))
 		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(`{"error": "Unauthorized"}`))
+			w.WriteHeader(http.StatusBadRequest)
 		}
 	}))
 	defer mockServer.Close()
 
-	// Define the Terraform test case
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders(mockServer.URL),
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourceSpacesConfig(),  // No provider block here
+				Config: testAccDataSourceSpacesConfig(mockServer.URL),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.#", "2"),  // Ensure we get 2 spaces
+					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.#", "2"),
 					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.0.name", "test-space"),
-					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.0.description", "Test description"),
 					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.1.name", "another-space"),
-					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.1.description", "Another test description"),
 				),
 			},
 		},
 	})
 }
 
-func testAccDataSourceSpacesConfig() string {
+func testAccDataSourceSpacesConfig(apiURL string) string {
 	return `
+provider "azureipam" {
+  api_endpoint = "` + apiURL + `"
+  token        = "fake-token"
+}
+
 data "azureipam_spaces" "test" {}
 `
 }

@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/gitopsiq/terraform-provider-azureipam/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -35,41 +36,10 @@ func Provider() *schema.Provider {
 	}
 }
 
-// ProviderWithApiEndpoint configures the provider with a custom API endpoint (used for testing)
-func ProviderWithApiEndpoint(apiEndpoint string) *schema.Provider {
-	return &schema.Provider{
-		Schema: map[string]*schema.Schema{
-			"api_endpoint": {
-				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: func() (interface{}, error) {
-					return apiEndpoint, nil
-				},
-				Description: "The Azure IPAM API endpoint URL",
-			},
-			"token": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Sensitive:   true,
-				DefaultFunc: schema.EnvDefaultFunc("AZURE_IPAM_TOKEN", nil),
-				Description: "The Azure AD token for authentication",
-			},
-		},
-		ResourcesMap: map[string]*schema.Resource{
-			"azureipam_space": resourceSpace(),
-		},
-		DataSourcesMap: map[string]*schema.Resource{
-			"azureipam_spaces": dataSourceSpaces(),
-		},
-		ConfigureContextFunc: providerConfigure,
-	}
-}
-
 // providerConfigure configures the API client used by the provider
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	// Get the API endpoint and token from the provider schema
 	apiEndpoint := d.Get("api_endpoint").(string)
 	token := d.Get("token").(string)
 
@@ -81,7 +51,6 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, diag.Errorf("API endpoint is required")
 	}
 
-	// Initialize the client with the API endpoint and token
 	client := client.NewClient(token, apiEndpoint)
 
 	return client, diags
