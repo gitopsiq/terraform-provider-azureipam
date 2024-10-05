@@ -23,6 +23,7 @@ func resourceSpace() *schema.Resource {
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,  // Allow Terraform to track description changes
 				Description: "A description of the space",
 			},
 		},
@@ -44,7 +45,7 @@ func resourceSpaceCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	// Set the resource ID
 	d.SetId(createdSpace.ID)
 
-	// Save name and description to state
+	// Ensure the state reflects the created space
 	d.Set("name", createdSpace.Name)
 	d.Set("description", createdSpace.Desc)
 
@@ -67,9 +68,13 @@ func resourceSpaceRead(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.FromErr(err)
 	}
 
-	// Save the space data to state
-	d.Set("name", space.Name)
-	d.Set("description", space.Desc)
+	// Set the data in the state
+	if err := d.Set("name", space.Name); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("description", space.Desc); err != nil {
+		return diag.FromErr(err)
+	}
 
 	return diag.Diagnostics{}
 }
