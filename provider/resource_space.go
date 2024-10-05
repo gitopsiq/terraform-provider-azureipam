@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	"log"
+	"log" // Add logging
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -25,7 +25,6 @@ func resourceSpace() *schema.Resource {
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true, // Track optional description changes
 				Description: "A description of the space",
 			},
 		},
@@ -38,7 +37,7 @@ func resourceSpaceCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	spaceName := d.Get("name").(string)
 	spaceDesc := d.Get("description").(string)
 
-	// Log the values being sent for creation
+	// Log the input values
 	log.Printf("[DEBUG] Creating space: name=%s, description=%s", spaceName, spaceDesc)
 
 	// Create the space via API
@@ -53,13 +52,15 @@ func resourceSpaceCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	// Log the API response
 	log.Printf("[DEBUG] API created space: ID=%s, name=%s, description=%s", createdSpace.ID, createdSpace.Name, createdSpace.Desc)
 
-	// Set state values
+	// Set Terraform state values
 	if err := d.Set("name", createdSpace.Name); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("description", createdSpace.Desc); err != nil {  // Ensure description is set
+	if err := d.Set("description", createdSpace.Desc); err != nil {
+		log.Printf("[ERROR] Failed to set description after create: %v", err)
 		return diag.FromErr(err)
 	}
+	log.Printf("[DEBUG] Terraform state after create: name=%s, description=%s", d.Get("name"), d.Get("description"))
 
 	return resourceSpaceRead(ctx, d, m)
 }
@@ -72,7 +73,7 @@ func resourceSpaceRead(ctx context.Context, d *schema.ResourceData, m interface{
 	// Log the Read operation
 	log.Printf("[DEBUG] Reading space: ID=%s", spaceID)
 
-	// Fetch space details via API
+	// Fetch space details from the API
 	space, err := client.GetSpace(spaceID)
 	if err != nil {
 		if space == nil {
@@ -83,16 +84,18 @@ func resourceSpaceRead(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.FromErr(err)
 	}
 
-	// Log the API response during read
+	// Log the API response
 	log.Printf("[DEBUG] API returned space: ID=%s, name=%s, description=%s", space.ID, space.Name, space.Desc)
 
 	// Ensure Terraform state is consistent
 	if err := d.Set("name", space.Name); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("description", space.Desc); err != nil {  // Ensure description is set
+	if err := d.Set("description", space.Desc); err != nil {
+		log.Printf("[ERROR] Failed to set description during read: %v", err)
 		return diag.FromErr(err)
 	}
+	log.Printf("[DEBUG] Terraform state after read: name=%s, description=%s", d.Get("name"), d.Get("description"))
 
 	return diag.Diagnostics{}
 }
