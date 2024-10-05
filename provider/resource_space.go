@@ -38,7 +38,7 @@ func resourceSpaceCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	spaceName := d.Get("name").(string)
 	spaceDesc := d.Get("description").(string)
 
-	// Log input values
+	// Log the values being sent for creation
 	log.Printf("[DEBUG] Creating space: name=%s, description=%s", spaceName, spaceDesc)
 
 	// Create the space via API
@@ -50,12 +50,16 @@ func resourceSpaceCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	// Set the resource ID
 	d.SetId(createdSpace.ID)
 
-	// Log API response
+	// Log the API response
 	log.Printf("[DEBUG] API created space: ID=%s, name=%s, description=%s", createdSpace.ID, createdSpace.Name, createdSpace.Desc)
 
-	// Ensure the state reflects the created space
-	d.Set("name", createdSpace.Name)
-	d.Set("description", createdSpace.Desc) // Ensure description is set properly
+	// Set state values
+	if err := d.Set("name", createdSpace.Name); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("description", createdSpace.Desc); err != nil {  // Ensure description is set
+		return diag.FromErr(err)
+	}
 
 	return resourceSpaceRead(ctx, d, m)
 }
@@ -79,12 +83,14 @@ func resourceSpaceRead(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.FromErr(err)
 	}
 
-	// Log API response
+	// Log the API response during read
 	log.Printf("[DEBUG] API returned space: ID=%s, name=%s, description=%s", space.ID, space.Name, space.Desc)
 
 	// Ensure Terraform state is consistent
-	d.Set("name", space.Name)
-	if err := d.Set("description", space.Desc); err != nil { // Ensure description is set
+	if err := d.Set("name", space.Name); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("description", space.Desc); err != nil {  // Ensure description is set
 		return diag.FromErr(err)
 	}
 

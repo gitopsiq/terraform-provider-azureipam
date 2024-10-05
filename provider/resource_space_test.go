@@ -12,11 +12,11 @@ func TestAccAzureIPAMSpace_basic(t *testing.T) {
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case r.Method == "POST" && r.URL.Path == "/api/spaces":
-			// Return a response that includes the description
+			// Ensure the mock API returns the correct description when creating the space
 			w.WriteHeader(http.StatusCreated)
 			w.Write([]byte(`{"id": "space-123", "name": "test-space", "description": "Test description"}`))
 		case r.Method == "GET" && r.URL.Path == "/api/spaces/space-123":
-			// Ensure the mock server returns the description when reading the resource
+			// Ensure the mock API returns the correct description when reading the space
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"id": "space-123", "name": "test-space", "description": "Test description"}`))
 		case r.Method == "DELETE" && r.URL.Path == "/api/spaces/space-123":
