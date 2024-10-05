@@ -83,6 +83,53 @@ func (c *Client) makeRequest(method, endpoint string, body interface{}) (*http.R
 	return resp, nil
 }
 
+// UpdateSpace updates an existing space in the Azure IPAM API by its ID
+func (c *Client) UpdateSpace(id string, desc string) (*Space, error) {
+	// Create the payload for the update
+	payload := map[string]interface{}{
+		"desc": desc,  // Update only the description, adjust based on API requirements
+	}
+
+	// Marshal the payload to JSON
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling update payload: %w", err)
+	}
+
+	// Create the request URL (assuming /api/spaces/{id} is the correct endpoint for updating)
+	url := fmt.Sprintf("%s/api/spaces/%s", c.BaseURL, id)
+
+	// Make the API request
+	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(body))  // Use PATCH for updates
+	if err != nil {
+		return nil, fmt.Errorf("error creating update request: %w", err)
+	}
+
+	// Set the headers
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
+	req.Header.Set("Content-Type", "application/json")
+
+	// Send the request
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error sending update request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Check for non-2xx status codes
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("received non-2xx status code: %d", resp.StatusCode)
+	}
+
+	// Decode the response into the Space struct
+	var updatedSpace Space
+	if err := json.NewDecoder(resp.Body).Decode(&updatedSpace); err != nil {
+		return nil, fmt.Errorf("error decoding update response: %w", err)
+	}
+
+	return &updatedSpace, nil
+}
+
 // CreateSpace creates a new space in the Azure IPAM API
 func (c *Client) CreateSpace(name, desc string) (*Space, error) {
 	space := Space{

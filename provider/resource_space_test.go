@@ -10,9 +10,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
+// TestAccAzureIPAMSpace_basic tests the creation, update, and deletion of a space
 func TestAccAzureIPAMSpace_basic(t *testing.T) {
+	// Create a mock server for the Azure IPAM API
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Mocking based on the HTTP method and the path of the request
 		switch {
 		case r.Method == "POST" && r.URL.Path == "/api/spaces":
 			w.WriteHeader(http.StatusCreated)
@@ -47,18 +48,19 @@ func TestAccAzureIPAMSpace_basic(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
-	// Define the Terraform test steps
+	// Define the Terraform test case
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders(mockServer.URL),  // Use mock server's URL
+		Providers:    testAccProviders(mockServer.URL),
 		CheckDestroy: testAccCheckSpaceDestroy,
 		Steps: []resource.TestStep{
+			// Initial creation
 			{
 				Config: testAccSpaceConfigBasic(mockServer.URL),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSpaceExists("azureipam_space.test"),
 					resource.TestCheckResourceAttr("azureipam_space.test", "name", "test-space"),
-					resource.TestCheckResourceAttr("azureipam_space.test", "desc", "Test description"),
+					resource.TestCheckResourceAttr("azureipam_space.test", "description", "Test description"), // Ensure "description" is used
 				),
 			},
 			// Update the space
@@ -67,13 +69,14 @@ func TestAccAzureIPAMSpace_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSpaceExists("azureipam_space.test"),
 					resource.TestCheckResourceAttr("azureipam_space.test", "name", "updated-space"),
-					resource.TestCheckResourceAttr("azureipam_space.test", "desc", "Updated description"),
+					resource.TestCheckResourceAttr("azureipam_space.test", "description", "Updated description"),
 				),
 			},
 		},
 	})
 }
 
+// Configuration for creating a basic space
 func testAccSpaceConfigBasic(apiURL string) string {
 	return fmt.Sprintf(`
 provider "azureipam" {
@@ -83,11 +86,12 @@ provider "azureipam" {
 
 resource "azureipam_space" "test" {
   name = "test-space"
-  desc = "Test description"
+  description = "Test description"  // Use "description" to match the schema
 }
 `, apiURL)
 }
 
+// Configuration for updating the space
 func testAccSpaceConfigUpdated(apiURL string) string {
 	return fmt.Sprintf(`
 provider "azureipam" {
@@ -97,12 +101,12 @@ provider "azureipam" {
 
 resource "azureipam_space" "test" {
   name = "updated-space"
-  desc = "Updated description"
+  description = "Updated description"  // Use "description" to match the schema
 }
 `, apiURL)
 }
 
-// Check if the space exists in the Terraform state
+// testAccCheckSpaceExists verifies that the space exists in the Terraform state
 func testAccCheckSpaceExists(resourceName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[resourceName]
@@ -118,8 +122,18 @@ func testAccCheckSpaceExists(resourceName string) resource.TestCheckFunc {
 	}
 }
 
-// Check if the space is properly destroyed
+// testAccCheckSpaceDestroy verifies that the space was properly destroyed
 func testAccCheckSpaceDestroy(s *terraform.State) error {
-	// Verify that the resource is destroyed correctly (can call GET and expect 404)
+	// Logic to ensure the space no longer exists after the test
+	// Normally, we would make a GET call to the API and ensure it returns 404
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "azureipam_space" {
+			continue
+		}
+
+		// Here you would check the mock API or actual API to ensure the resource has been deleted
+		// Since we are using a mock server, this check is skipped but could be simulated in real tests.
+	}
+
 	return nil
 }

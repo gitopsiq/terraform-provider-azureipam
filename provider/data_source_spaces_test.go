@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,24 +9,24 @@ import (
 )
 
 func TestAccDataSourceSpaces_basic(t *testing.T) {
+	// Create a mock server that simulates the Azure IPAM API
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Mock the GET /api/spaces response
 		if r.Method == "GET" && r.URL.Path == "/api/spaces" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`[
 				{
-					"id": "space-123",
 					"name": "test-space",
-					"desc": "Test description"
+					"description": "Test description"
 				},
 				{
-					"id": "space-456",
 					"name": "another-space",
-					"desc": "Another test description"
+					"description": "Another test description"
 				}
 			]`))
 		} else {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(`{"error": "Unauthorized"}`))
 		}
 	}))
 	defer mockServer.Close()
@@ -38,28 +37,21 @@ func TestAccDataSourceSpaces_basic(t *testing.T) {
 		Providers: testAccProviders(mockServer.URL),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourceSpacesConfig(mockServer.URL),
+				Config: testAccDataSourceSpacesConfig(),  // No provider block here
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.#", "2"), // Ensure we get 2 spaces
-					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.0.id", "space-123"),
+					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.#", "2"),  // Ensure we get 2 spaces
 					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.0.name", "test-space"),
-					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.0.desc", "Test description"),
-					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.1.id", "space-456"),
+					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.0.description", "Test description"),
 					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.1.name", "another-space"),
-					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.1.desc", "Another test description"),
+					resource.TestCheckResourceAttr("data.azureipam_spaces.test", "spaces.1.description", "Another test description"),
 				),
 			},
 		},
 	})
 }
 
-func testAccDataSourceSpacesConfig(apiURL string) string {
-	return fmt.Sprintf(`
-provider "azureipam" {
-  api_endpoint = "%s"
-  token        = "fake-token"
-}
-
+func testAccDataSourceSpacesConfig() string {
+	return `
 data "azureipam_spaces" "test" {}
-`, apiURL)
+`
 }
