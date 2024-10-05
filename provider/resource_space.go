@@ -28,17 +28,21 @@ func resourceSpace() *schema.Resource {
 	}
 }
 
-func resourceSpaceCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	name := d.Get("name").(string)
-	description := d.Get("description").(string)
+func resourceSpaceCreate(d *schema.ResourceData, m interface{}) error {
+	client := m.(*Client)
+	spaceName := d.Get("name").(string)
+	spaceDesc := d.Get("desc").(string)
 
-	// TODO: Use the client to create the space
-	// For now, we'll just use the name and description to show they're being used
-	d.SetId(name)
-	d.Set("description", description)
+	// Make API request
+	createdSpace, err := client.CreateSpace(spaceName, spaceDesc)
+	if err != nil {
+			return fmt.Errorf("error creating space: %s", err)
+	}
 
-	return resourceSpaceRead(ctx, d, m)
+	d.SetId(createdSpace.ID)
+	return resourceSpaceRead(d, m)
 }
+
 
 func resourceSpaceRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	// TODO: Implement the read operation

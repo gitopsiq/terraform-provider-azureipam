@@ -2,10 +2,11 @@ package provider
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
+
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
@@ -35,14 +36,14 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	// Commenting out unused variables for now
-	// apiEndpoint := d.Get("api_endpoint").(string)
-	// token := d.Get("token").(string)
+	var diags diag.Diagnostics
+	token := d.Get("token").(string)
 
-	// TODO: Initialize and return the client
-	// client := NewClient(apiEndpoint, token)
-	// return client, diag.Diagnostics{}
+	if token == "" {
+			return nil, diag.Errorf("token is required")
+	}
 
-	// For now, we'll return nil as we haven't implemented the client yet
-	return nil, diag.Diagnostics{}
+	client := NewClient(token, "https://api.azure-ipam.com")
+	return client, diags
 }
+
