@@ -1,8 +1,8 @@
 package client
 
-// Space represents a space in the Azure IPAM system
+// Space represents a space resource in Azure IPAM
 type Space struct {
-	ID   string `json:"id,omitempty"`   // ID is the unique identifier for the space
-	Name string `json:"name"`           // Name is the name of the space
-	Desc string `json:"desc,omitempty"` // Desc is an optional description of the space
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Desc string `json:"description"`
 }
