@@ -2,10 +2,10 @@ package provider
 
 import (
 	"context"
-	"fmt"  // Add fmt to handle error formatting
-	"github.com/gitopsiq/terraform-provider-azureipam/client" 
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/gitopsiq/terraform-provider-azureipam/client"
 )
 
 func resourceSpace() *schema.Resource {
@@ -29,23 +29,25 @@ func resourceSpace() *schema.Resource {
 	}
 }
 
-// Fix the function signature to include context
 func resourceSpaceCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*client.Client)
 
 	spaceName := d.Get("name").(string)
-	spaceDesc := d.Get("description").(string)  // Use "description" for consistency
+	spaceDesc := d.Get("description").(string)
 
-	// Call the API to create a space
+	// Make API request to create a space
 	createdSpace, err := client.CreateSpace(spaceName, spaceDesc)
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("error creating space: %w", err))
+		return diag.FromErr(fmt.Errorf("error creating space: %s", err))
 	}
 
-	// Set the ID for the resource
+	// Set the resource ID
 	d.SetId(createdSpace.ID)
 
-	// Call resourceSpaceRead to sync the state after creation
+	// Save name and description to state
+	d.Set("name", createdSpace.Name)
+	d.Set("description", createdSpace.Desc)
+
 	return resourceSpaceRead(ctx, d, m)
 }
 
@@ -54,18 +56,18 @@ func resourceSpaceRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 	spaceID := d.Id()
 
-	// Call the API to get the space details
+	// Make API request to read space details
 	space, err := client.GetSpace(spaceID)
 	if err != nil {
-		// Handle the case where the space was not found
 		if space == nil {
+			// Resource no longer exists
 			d.SetId("")
-			return diag.FromErr(fmt.Errorf("space not found: %w", err))
+			return nil
 		}
-		return diag.FromErr(fmt.Errorf("error reading space: %w", err))
+		return diag.FromErr(err)
 	}
 
-	// Update the Terraform state with the retrieved space details
+	// Save the space data to state
 	d.Set("name", space.Name)
 	d.Set("description", space.Desc)
 
@@ -77,18 +79,16 @@ func resourceSpaceUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 
 	spaceID := d.Id()
 
-	// Check if the description has changed
 	if d.HasChange("description") {
 		description := d.Get("description").(string)
 
-		// Update the space description using the API
+		// Make API request to update space description
 		_, err := client.UpdateSpace(spaceID, description)
 		if err != nil {
-			return diag.FromErr(fmt.Errorf("error updating space: %w", err))
+			return diag.FromErr(fmt.Errorf("error updating space: %s", err))
 		}
 	}
 
-	// Re-read the resource to update the state
 	return resourceSpaceRead(ctx, d, m)
 }
 
@@ -97,13 +97,13 @@ func resourceSpaceDelete(ctx context.Context, d *schema.ResourceData, m interfac
 
 	spaceID := d.Id()
 
-	// Call the API to delete the space
+	// Make API request to delete the space
 	err := client.DeleteSpace(spaceID)
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("error deleting space: %w", err))
+		return diag.FromErr(fmt.Errorf("error deleting space: %s", err))
 	}
 
-	// Clear the resource ID to remove it from the state
+	// Remove the resource from state
 	d.SetId("")
 
 	return diag.Diagnostics{}
