@@ -12,9 +12,11 @@ func TestAccAzureIPAMSpace_basic(t *testing.T) {
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case r.Method == "POST" && r.URL.Path == "/api/spaces":
+			// Return a response that includes the description
 			w.WriteHeader(http.StatusCreated)
 			w.Write([]byte(`{"id": "space-123", "name": "test-space", "description": "Test description"}`))
 		case r.Method == "GET" && r.URL.Path == "/api/spaces/space-123":
+			// Ensure the mock server returns the description when reading the resource
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"id": "space-123", "name": "test-space", "description": "Test description"}`))
 		case r.Method == "DELETE" && r.URL.Path == "/api/spaces/space-123":
@@ -25,6 +27,7 @@ func TestAccAzureIPAMSpace_basic(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
+	// Define the Terraform test case
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -33,6 +36,7 @@ func TestAccAzureIPAMSpace_basic(t *testing.T) {
 				Config: testAccSpaceConfigBasic(mockServer.URL),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("azureipam_space.test", "name", "test-space"),
+					resource.TestCheckResourceAttr("azureipam_space.test", "description", "Test description"),  // Check the description
 				),
 			},
 		},
