@@ -11,10 +11,11 @@ package openapi
 
 import (
 	"context"
+	"testing"
+
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
 )
 
 func Test_openapi_ToolsAPIService(t *testing.T) {
@@ -24,7 +25,7 @@ func Test_openapi_ToolsAPIService(t *testing.T) {
 
 	t.Run("Test ToolsAPIService CidrCheckApiToolsCidrCheckPost", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.ToolsAPI.CidrCheckApiToolsCidrCheckPost(context.Background()).Execute()
 
@@ -36,7 +37,7 @@ func Test_openapi_ToolsAPIService(t *testing.T) {
 
 	t.Run("Test ToolsAPIService NextAvailableSubnetApiToolsNextAvailableSubnetPost", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.ToolsAPI.NextAvailableSubnetApiToolsNextAvailableSubnetPost(context.Background()).Execute()
 
@@ -48,7 +49,7 @@ func Test_openapi_ToolsAPIService(t *testing.T) {
 
 	t.Run("Test ToolsAPIService NextAvailableVnetApiToolsNextAvailableVNetPost", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.ToolsAPI.NextAvailableVnetApiToolsNextAvailableVNetPost(context.Background()).Execute()
 

@@ -33,7 +33,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
@@ -101,7 +101,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
@@ -169,7 +169,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
@@ -241,7 +241,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
@@ -307,7 +307,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
@@ -379,7 +379,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
@@ -445,7 +445,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
@@ -517,7 +517,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
@@ -585,7 +585,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+	openapiclient "github.com/gitopsiq/terraform-provider-azureipam/generated-client"
 )
 
 func main() {
