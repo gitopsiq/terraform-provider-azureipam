@@ -143,12 +143,6 @@ func Test_openapi_SpacesAPIService(t *testing.T) {
 
 	})
 
-	// SpaceReq defines the structure of the request for creating a space
-	type SpaceReq struct {
-		Name        string `json:"name"`
-		Description string `json:"description"`
-	}
-
 	t.Run("Test SpacesAPIService CreateSpaceApiSpacesPost", func(t *testing.T) {
 		spaceReq := SpaceReq{
 			Name:        "example-space",
