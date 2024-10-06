@@ -1,0 +1,5383 @@
+openapi: 3.1.0
+info:
+  contact:
+    email: ipam@microsoft.com
+    name: Azure IPAM Team
+    url: https://github.com/azure/ipam
+  description: |2
+
+    Azure IPAM is a lightweight solution developed on top of the Azure platform designed to help Azure customers manage their enterprise IP Address space easily and effectively.
+  title: Azure IPAM
+  version: 3.4.0
+servers:
+- url: /
+paths:
+  /api/admin/admins:
+    get:
+      description: Get a list of all IPAM admins.
+      operationId: get_admins_api_admin_admins_get
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Admin'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get All Admins
+      tags:
+      - admin
+    post:
+      description: |-
+        Create an new IPAM Administrator with the following details:
+
+        - **type**: [ "User" | "Principal" ]
+        - **name**: Full name of the Administrator or DisplayName of the Service Principal
+        - **email**: Email address for the Administrator (not required for 'Principal' type)
+        - **id**: Azure AD ObjectID for the Administrator user Service Principal
+      operationId: create_admin_api_admin_admins_post
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Admin'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create IPAM Admin
+      tags:
+      - admin
+    put:
+      description: |-
+        Replace the list of IPAM Administrators with the following details:
+
+        - Array **[ ]** of:
+            - **type**: [ "User" | "Principal" ]
+            - **name**: Full name of the Administrator or DisplayName of the Service Principal
+            - **email**: Email address for the Administrator (not required for 'Principal' type)
+            - **id**: Azure AD ObjectID for the Administrator user Service Principal
+      operationId: update_admins_api_admin_admins_put
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/Admin'
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Replace IPAM Admins
+      tags:
+      - admin
+  /api/admin/admins/{objectId}:
+    delete:
+      description: Remove a specific IPAM Administrator
+      operationId: delete_admin_api_admin_admins__objectId__delete
+      parameters:
+      - description: Azure AD ObjectID for the target user
+        explode: false
+        in: path
+        name: objectId
+        required: true
+        schema:
+          description: Azure AD ObjectID for the target user
+          format: uuid
+          title: Objectid
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete IPAM Admin
+      tags:
+      - admin
+    get:
+      description: Get a specific IPAM admin.
+      operationId: get_admins_api_admin_admins__objectId__get
+      parameters:
+      - description: Azure AD ObjectID for the target user
+        explode: false
+        in: path
+        name: objectId
+        required: true
+        schema:
+          description: Azure AD ObjectID for the target user
+          format: uuid
+          title: Objectid
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get IPAM Admin
+      tags:
+      - admin
+  /api/admin/exclusions:
+    get:
+      description: Get a list of excluded subscriptions.
+      operationId: get_exclusions_api_admin_exclusions_get
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  format: uuid
+                  type: string
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Excluded Subscriptions
+      tags:
+      - admin
+    post:
+      description: |-
+        Add a list of excluded Subscriptions:
+
+        - **[&lt;UUID&gt;]**: Array of Subscription ID's
+      operationId: add_exclusions_api_admin_exclusions_post
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: uuid
+                type: string
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Add Excluded Subscription(s)
+      tags:
+      - admin
+    put:
+      description: |-
+        Replace the list of excluded Subscriptions:
+
+        - **[&lt;UUID&gt;]**: Array of Subscription ID's
+      operationId: update_exclusions_api_admin_exclusions_put
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                format: uuid
+                type: string
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Replace Excluded Subscriptions
+      tags:
+      - admin
+  /api/admin/exclusions/{subscriptionId}:
+    delete:
+      description: Remove an excluded Subscription ID.
+      operationId: remove_exclusion_api_admin_exclusions__subscriptionId__delete
+      parameters:
+      - description: Azure Subscription ID
+        explode: false
+        in: path
+        name: subscriptionId
+        required: true
+        schema:
+          description: Azure Subscription ID
+          format: uuid
+          title: Subscriptionid
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Remove Excluded Subscription
+      tags:
+      - admin
+  /api/users:
+    get:
+      description: Get a list of IPAM Users.
+      operationId: get_users_api_users_get
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get All Users
+      tags:
+      - users
+  /api/users/me:
+    get:
+      description: Get your IPAM user details.
+      operationId: get_user_api_users_me_get
+      parameters:
+      - description: Show expanded user details
+        explode: true
+        in: query
+        name: expand
+        required: false
+        schema:
+          default: false
+          description: Show expanded user details
+          title: Expand
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_Get_User_Api_Users_Me_Get'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get My User Details
+      tags:
+      - users
+    patch:
+      description: |-
+        Update a User with a JSON patch:
+
+        - **[&lt;JSON Patch&gt;]**: Array of JSON Patches
+
+        Allowed operations:
+        - **replace**
+
+        Allowed paths:
+        - **/darkMode**
+        - **/apiRefresh**
+      operationId: update_user_api_users_me_patch
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/JSONPatch'
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update User Details
+      tags:
+      - users
+  /api/tools/nextAvailableSubnet:
+    post:
+      description: |-
+        Get the next available Subnet CIDR in a Virtual Network with the following information:
+
+        - **vnet_id**: Virtual Network Resource ID
+        - **size**: Network mask bits
+        - **reverse_search**:
+            - **true**: New subnets will be located as close to the <u>end</u> of the Virtual Network CIDR as possible
+            - **false (default)**: New subnets will be located as close to the <u>beginning</u> of the Virtual Network CIDR as possible
+        - **smallest_cidr**:
+            - **true**: New subnets will be created using the smallest possible available CIDR (e.g. it will not break up large CIDR blocks when possible)
+            - **false (default)**: New subnets will be created using the first available CIDR, regardless of size
+      operationId: next_available_subnet_api_tools_nextAvailableSubnet_post
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubnetCIDRReq'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewSubnetCIDR'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Next Available Subnet in a Virtual Network
+      tags:
+      - tools
+  /api/tools/nextAvailableVNet:
+    post:
+      description: |-
+        Get the next available Virtual Network CIDR in a list of Blocks with the following information:
+
+        - **space**: Space name
+        - **blocks**: Array of Block names (*Evaluated in the order provided*)
+        - **size**: Network mask bits
+        - **reverse_search**:
+            - **true**: New networks will be created as close to the <u>end</u> of the block as possible
+            - **false (default)**: New networks will be created as close to the <u>beginning</u> of the block as possible
+        - **smallest_cidr**:
+            - **true**: New networks will be created using the smallest possible available block (e.g. it will not break up large CIDR blocks when possible)
+            - **false (default)**: New networks will be created using the first available block, regardless of size
+      operationId: next_available_vnet_api_tools_nextAvailableVNet_post
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VNetCIDRReq'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewVNetCIDR'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Next Available Virtual Network from a List of Blocks
+      tags:
+      - tools
+  /api/tools/cidrCheck:
+    post:
+      description: |-
+        Get a list of Virtual Networks which overlap a given CIDR range with the following information:
+
+        - **cidr**: CIDR range
+      operationId: cidr_check_api_tools_cidrCheck_post
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CIDRCheckReq'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CIDRCheckRes'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Find Virtual Networks that Overlap a Given CIDR Range
+      tags:
+      - tools
+  /api/spaces:
+    get:
+      description: Get a list of all Spaces.
+      operationId: get_spaces_api_spaces_get
+      parameters:
+      - description: Expand network references to full network objects
+        explode: true
+        in: query
+        name: expand
+        required: false
+        schema:
+          default: false
+          description: Expand network references to full network objects
+          title: Expand
+          type: boolean
+        style: form
+      - description: Append utilization information for each network
+        explode: true
+        in: query
+        name: utilization
+        required: false
+        schema:
+          default: false
+          description: Append utilization information for each network
+          title: Utilization
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_Get_Spaces_Api_Spaces_Get'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get All Spaces
+      tags:
+      - spaces
+    post:
+      description: |-
+        Create an new Space with the following details:
+
+        - **name**: Name of the Space
+        - **desc**: A description for the Space
+      operationId: create_space_api_spaces_post
+      parameters:
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceReq'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create New Space
+      tags:
+      - spaces
+  /api/spaces/{space}:
+    delete:
+      description: Remove a specific Space.
+      operationId: delete_space_api_spaces__space__delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Forcefully delete a Space with existing Blocks
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          nullable: true
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete a Space
+      tags:
+      - spaces
+    get:
+      description: Get the details of a specific Space.
+      operationId: get_space_api_spaces__space__get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Expand network references to full network objects
+        explode: true
+        in: query
+        name: expand
+        required: false
+        schema:
+          default: false
+          description: Expand network references to full network objects
+          title: Expand
+          type: boolean
+        style: form
+      - description: Append utilization information for each network
+        explode: true
+        in: query
+        name: utilization
+        required: false
+        schema:
+          default: false
+          description: Append utilization information for each network
+          title: Utilization
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_Get_Space_Api_Spaces__Space__Get'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Space Details
+      tags:
+      - spaces
+    patch:
+      description: |-
+        Update a Space with a JSON patch:
+
+        - **[&lt;JSON Patch&gt;]**: Array of JSON Patches
+
+        Allowed operations:
+        - **replace**
+
+        Allowed paths:
+        - **/name**
+        - **/desc**
+      operationId: update_space_api_spaces__space__patch
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/JSONPatch'
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update Space Details
+      tags:
+      - spaces
+  /api/spaces/{space}/reservations:
+    get:
+      description: Get a list of CIDR Reservations for all Blocks within the target
+        Space.
+      operationId: get_multi_block_reservations_api_spaces__space__reservations_get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Include settled reservations.
+        explode: true
+        in: query
+        name: settled
+        required: false
+        schema:
+          default: false
+          description: Include settled reservations.
+          title: Settled
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ReservationExpand'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Reservations for all Blocks within a Space
+      tags:
+      - spaces
+    post:
+      description: |-
+        Create a CIDR Reservation for the first available Block from a list of Blocks with the following information:
+
+        - **blocks**: Array of Block names (*Evaluated in the order provided*)
+        - **size**: Network mask bits
+        - **desc**: Description (optional)
+        - **reverse_search**:
+            - **true**: New networks will be created as close to the <u>end</u> of the block as possible
+            - **false (default)**: New networks will be created as close to the <u>beginning</u> of the block as possible
+        - **smallest_cidr**:
+            - **true**: New networks will be created using the smallest possible available block (e.g. it will not break up large CIDR blocks when possible)
+            - **false (default)**: New networks will be created using the first available block, regardless of size
+      operationId: create_multi_block_reservation_api_spaces__space__reservations_post
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceCIDRReq'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationExpand'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create CIDR Reservation from List of Blocks
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks:
+    get:
+      description: Get a list of all Blocks within a specific Space.
+      operationId: get_blocks_api_spaces__space__blocks_get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Expand network references to full network objects
+        explode: true
+        in: query
+        name: expand
+        required: false
+        schema:
+          default: false
+          description: Expand network references to full network objects
+          title: Expand
+          type: boolean
+        style: form
+      - description: Append utilization information for each network
+        explode: true
+        in: query
+        name: utilization
+        required: false
+        schema:
+          default: false
+          description: Append utilization information for each network
+          title: Utilization
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_Get_Blocks_Api_Spaces__Space__Blocks_Get'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get all Blocks within a Space
+      tags:
+      - spaces
+    post:
+      description: |-
+        Create an new Block within a Space with the following details:
+
+        - **name**: Name of the Block
+        - **cidr**: IPv4 CIDR Range
+      operationId: create_block_api_spaces__space__blocks_post
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockReq'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Block'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create a new Block
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}:
+    delete:
+      description: Remove a specific Block.
+      operationId: delete_block_api_spaces__space__blocks__block__delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Forcefully delete a Block with existing networks and/or reservations
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          nullable: true
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete a Block
+      tags:
+      - spaces
+    get:
+      description: Get the details of a specific Block.
+      operationId: get_block_api_spaces__space__blocks__block__get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Expand network references to full network objects
+        explode: true
+        in: query
+        name: expand
+        required: false
+        schema:
+          default: false
+          description: Expand network references to full network objects
+          title: Expand
+          type: boolean
+        style: form
+      - description: Append utilization information for each network
+        explode: true
+        in: query
+        name: utilization
+        required: false
+        schema:
+          default: false
+          description: Append utilization information for each network
+          title: Utilization
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_Get_Block_Api_Spaces__Space__Blocks__Block__Get'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Block Details
+      tags:
+      - spaces
+    patch:
+      description: |-
+        Update a Block with a JSON patch:
+
+        - **[&lt;JSON Patch&gt;]**: Array of JSON Patches
+
+        Allowed operations:
+        - **replace**
+
+        Allowed paths:
+        - **/name**
+        - **/cidr**
+      operationId: update_block_api_spaces__space__blocks__block__patch
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/JSONPatch'
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Block'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update Block Details
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/available:
+    get:
+      description: |-
+        Get a list of Azure networks which can be associated to the target Block.
+        This list is a combination on Virtual Networks and vWAN Virtual Hubs.
+        Any Networks which overlap outstanding reservations are excluded.
+      operationId: available_block_nets_api_spaces__space__blocks__block__available_get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Expand network references to full network objects
+        explode: true
+        in: query
+        name: expand
+        required: false
+        schema:
+          default: false
+          description: Expand network references to full network objects
+          title: Expand
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_Available_Block_Nets_Api_Spaces__Space__Blocks__Block__Available_Get'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Available Block Networks
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/networks:
+    delete:
+      description: |-
+        Remove one or more networks currently associated to the target Block with the following information:
+
+        - **[&lt;str&gt;]**: Array of Azure Resource ID's
+      operationId: delete_block_nets_api_spaces__space__blocks__block__networks_delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: string
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Remove Block Networks
+      tags:
+      - spaces
+    get:
+      description: |-
+        Get a list of virtual networks which are currently associated to the target Block.
+        This list is a combination on Virtual Networks and vWAN Virtual Hubs.
+      operationId: get_block_nets_api_spaces__space__blocks__block__networks_get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Expand network references to full network objects
+        explode: true
+        in: query
+        name: expand
+        required: false
+        schema:
+          default: false
+          description: Expand network references to full network objects
+          title: Expand
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_Get_Block_Nets_Api_Spaces__Space__Blocks__Block__Networks_Get'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List Block Networks
+      tags:
+      - spaces
+    post:
+      description: |-
+        Associate a network to the target Block with the following information:
+
+        - **id**: Azure Resource ID
+      operationId: create_block_net_api_spaces__space__blocks__block__networks_post
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VNet'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockBasic'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Add Block Network
+      tags:
+      - spaces
+    put:
+      description: |-
+        Replace the list of networks currently associated to the target Block with the following information:
+
+        - **[&lt;str&gt;]**: Array of Azure Resource ID's
+      operationId: update_block_vnets_api_spaces__space__blocks__block__networks_put
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: string
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Network'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Replace Block Networks
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/externals:
+    get:
+      description: Get a list of External Networks which are currently associated
+        to the target Block.
+      operationId: get_external_networks_api_spaces__space__blocks__block__externals_get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExtNet'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List External Networks
+      tags:
+      - spaces
+    post:
+      description: |-
+        Create an External Network within the target Block with the following information:
+
+        - **name**: Name of the external network
+        - **desc**: Description of the external network
+        - **cidr**: CIDR of the external network
+      operationId: create_external_network_api_spaces__space__blocks__block__externals_post
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtNetReq'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtNetExpand'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create External Network
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/externals/{external}:
+    delete:
+      description: Remove a specific External Network currently associated to the
+        target Block
+      operationId: delete_external_network_api_spaces__space__blocks__block__externals__external__delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target external network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target external network
+          title: External
+          type: string
+        style: simple
+      - description: Forcefully delete an External Network with existing Subnets
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          nullable: true
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Remove External Network
+      tags:
+      - spaces
+    get:
+      description: Get the details of a specific External Network.
+      operationId: get_external_network_api_spaces__space__blocks__block__externals__external__get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target external network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target external network
+          title: External
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtNet'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get External Network
+      tags:
+      - spaces
+    patch:
+      description: |-
+        Update an External Network with a JSON patch:
+
+        - **[&lt;JSON Patch&gt;]**: Array of JSON Patches
+
+        Allowed operations:
+        - **replace**
+
+        Allowed paths:
+        - **/name**
+        - **/desc**
+        - **/cidr**
+      operationId: update_ext_network_api_spaces__space__blocks__block__externals__external__patch
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/JSONPatch'
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtNet'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update External Network Details
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/externals/{external}/subnets:
+    get:
+      description: Get a list of Subnets which are currently associated to the target
+        External Network.
+      operationId: get_external_subnets_api_spaces__space__blocks__block__externals__external__subnets_get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExtSubnet'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List External Network Subnets
+      tags:
+      - spaces
+    post:
+      description: |-
+        Create a Subnet within the target External Network with the following information:
+
+        - **name**: Name of the subnet
+        - **desc**: Description (optional)
+        - **size**: Network mask bits
+        - **cidr**: Specific CIDR of the subnet (alternative to size)
+      operationId: create_external_subnet_api_spaces__space__blocks__block__externals__external__subnets_post
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtSubnetReq'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtSubnetExpand'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create External Network Subnet
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/externals/{external}/subnets/{subnet}:
+    delete:
+      description: Remove a specific Subnet currently associated to the target External
+        Network
+      operationId: delete_external_subnet_api_spaces__space__blocks__block__externals__external__subnets__subnet__delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target external network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target external network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target external subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target external subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Forcefully delete an External Network with existing Subnets
+        explode: true
+        in: query
+        name: force
+        required: false
+        schema:
+          nullable: true
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Remove External Network Subnet
+      tags:
+      - spaces
+    get:
+      description: Get the details of a specific External Subnet.
+      operationId: get_external_subnet_api_spaces__space__blocks__block__externals__external__subnets__subnet__get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target external network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target external network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target external subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target external subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtSubnet'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get External Network Subnet
+      tags:
+      - spaces
+    patch:
+      description: |-
+        Update an External Subnet with a JSON patch:
+
+        - **[&lt;JSON Patch&gt;]**: Array of JSON Patches
+
+        Allowed operations:
+        - **replace**
+
+        Allowed paths:
+        - **/name**
+        - **/desc**
+        - **/cidr**
+      operationId: update_ext_subnet_api_spaces__space__blocks__block__externals__external__subnets__subnet__patch
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target external subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target external subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/JSONPatch'
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtSubnet'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update External Subnet Details
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/externals/{external}/subnets/{subnet}/endpoints:
+    delete:
+      description: |-
+        Remove one or more Endpopints currently associated to the target External Network Subnet with the following information:
+
+        - **[&lt;str&gt;]**: Array of Endpoint Names
+      operationId: delete_external_subnet_endpoints_api_spaces__space__blocks__block__externals__external__subnets__subnet__endpoints_delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target External Network Subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target External Network Subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: string
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Remove External Network Subnet Endpoints
+      tags:
+      - spaces
+    get:
+      description: Get a list of Endpoints which are currently associated to the target
+        External Network Subnet.
+      operationId: get_external_subnet_endpoints_api_spaces__space__blocks__block__externals__external__subnets__subnet__endpoints_get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target External Network Subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target External Network Subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExtEndpoint'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: List External Network Subnet Endpoints
+      tags:
+      - spaces
+    post:
+      description: |-
+        Create an Endpoint within the target External Network Subnet with the following information:
+
+        - **name**: Name of the endpoint
+        - **desc**: Description of the endpoint
+        - **ip**: IP Address of the endpoint or NONE to automatically assign the next available IP address
+      operationId: create_external_subnet_endpoint_api_spaces__space__blocks__block__externals__external__subnets__subnet__endpoints_post
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target External Network Subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target External Network Subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtEndpointReq'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtEndpoint'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Add External Network Subnet Endpoint
+      tags:
+      - spaces
+    put:
+      description: |-
+        Replace the list of Endpoints currently associated to the target External Network Subnet with the following information:
+
+        - **[&lt;Endpoint&gt;]**: Array of Endpoints
+
+        Endpoint:
+
+        - **name**: Name of the endpoint
+        - **desc**: Description of the endpoint
+        - **ip**: IP Address of the endpoint or NONE to automatically assign the next available IP address
+      operationId: update_external_subnet_enpoints_api_spaces__space__blocks__block__externals__external__subnets__subnet__endpoints_put
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target External Network Subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target External Network Subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/ExtEndpointReq'
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExtEndpoint'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Replace External Network Subnet Endpoints
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/externals/{external}/subnets/{subnet}/endpoints/{endpoint}:
+    delete:
+      description: Remove a specific Endpoint currently associated to the target External
+        Network Subnet
+      operationId: delete_external_subnet_endpoint_api_spaces__space__blocks__block__externals__external__subnets__subnet__endpoints__endpoint__delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target external network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target external network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target external subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target external subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Name of the target external subnet endpoint
+        explode: false
+        in: path
+        name: endpoint
+        required: true
+        schema:
+          description: Name of the target external subnet endpoint
+          title: Endpoint
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Remove External Network Subnet Endpoint
+      tags:
+      - spaces
+    get:
+      description: Get the details of a specific External Subnet Endpoint.
+      operationId: get_external_subnet_endpoint_api_spaces__space__blocks__block__externals__external__subnets__subnet__endpoints__endpoint__get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target external network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target external network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target external subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target external subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Name of the target external subnet endpoint
+        explode: false
+        in: path
+        name: endpoint
+        required: true
+        schema:
+          description: Name of the target external subnet endpoint
+          title: Endpoint
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtEndpoint'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get External Network Subnet Endpoint
+      tags:
+      - spaces
+    patch:
+      description: |-
+        Update an External Endpoint with a JSON patch:
+
+        - **[&lt;JSON Patch&gt;]**: Array of JSON Patches
+
+        Allowed operations:
+        - **replace**
+
+        Allowed paths:
+        - **/name**
+        - **/desc**
+        - **/ip**
+      operationId: update_ext_endpoint_api_spaces__space__blocks__block__externals__external__subnets__subnet__endpoints__endpoint__patch
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Name of the target External Network
+        explode: false
+        in: path
+        name: external
+        required: true
+        schema:
+          description: Name of the target External Network
+          title: External
+          type: string
+        style: simple
+      - description: Name of the target external subnet
+        explode: false
+        in: path
+        name: subnet
+        required: true
+        schema:
+          description: Name of the target external subnet
+          title: Subnet
+          type: string
+        style: simple
+      - description: Name of the target external subnet endpoint
+        explode: false
+        in: path
+        name: endpoint
+        required: true
+        schema:
+          description: Name of the target external subnet endpoint
+          title: Endpoint
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/JSONPatch'
+              type: array
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtEndpoint'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update External Endpoint Details
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/reservations:
+    delete:
+      description: |-
+        Remove one or more CIDR Reservations for the target Block.
+
+        - **[&lt;str&gt;]**: Array of CIDR Reservation ID's
+      operationId: delete_block_reservations_api_spaces__space__blocks__block__reservations_delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: string
+              type: array
+        required: true
+      responses:
+        "204":
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete CIDR Reservations
+      tags:
+      - spaces
+    get:
+      description: Get a list of CIDR Reservations for the target Block.
+      operationId: get_block_reservations_api_spaces__space__blocks__block__reservations_get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Include settled reservations.
+        explode: true
+        in: query
+        name: settled
+        required: false
+        schema:
+          default: false
+          description: Include settled reservations.
+          title: Settled
+          type: boolean
+        style: form
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ReservationExpand'
+                type: array
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Block Reservations
+      tags:
+      - spaces
+    post:
+      description: |-
+        Create a CIDR Reservation for the target Block with the following information:
+
+        - **size**: Network mask bits
+        - **cidr**: Specific CIDR to reserve (alternative to 'size')
+        - **desc**: Description (optional)
+        - **reverse_search**:
+            - **true**: New networks will be created as close to the <u>end</u> of the block as possible
+            - **false (default)**: New networks will be created as close to the <u>beginning</u> of the block as possible
+        - **smallest_cidr**:
+            - **true**: New networks will be created using the smallest possible available block (e.g. it will not break up large CIDR blocks when possible)
+            - **false (default)**: New networks will be created using the first available block, regardless of size
+
+        ### <u>Usage Examples</u>
+
+        #### *Request a new /24:*
+
+        ```json
+        {
+            "size": 24
+            "desc": "New CIDR for Business Unit 1"
+        }
+        ```
+
+        #### *Request a new /24, searching from the end of the CIDR range:*
+
+        ```json
+        {
+            "size": 24,
+            "desc": "New CIDR for Business Unit 1",
+            "reverse_search": true
+        }
+        ```
+
+        #### *Request a new /24, searching from the end of the CIDR range, using the smallest available CIDR block from the available address space:*
+
+        ```json
+        {
+            "size": 24,
+            "desc": "New CIDR for Business Unit 1",
+            "reverse_search": true,
+            "smallest_cidr": true
+        }
+        ```
+
+        #### *Request a specific /24:*
+
+        ```json
+        {
+            "cidr": "10.0.100.0/24",
+            "desc" "New CIDR for Business Unit 1"
+        }
+        ```
+      operationId: create_block_reservation_api_spaces__space__blocks__block__reservations_post
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockCIDRReq'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationExpand'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create CIDR Reservation
+      tags:
+      - spaces
+  /api/spaces/{space}/blocks/{block}/reservations/{reservation}:
+    delete:
+      description: Remove a specific CIDR Reservation.
+      operationId: delete_block_reservations_api_spaces__space__blocks__block__reservations__reservation__delete
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: ID of the target Reservation
+        explode: false
+        in: path
+        name: reservation
+        required: true
+        schema:
+          description: ID of the target Reservation
+          title: Reservation
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete CIDR Reservation
+      tags:
+      - spaces
+    get:
+      description: Get the details of a specific CIDR Reservation.
+      operationId: get_block_reservations_api_spaces__space__blocks__block__reservations__reservation__get
+      parameters:
+      - description: Name of the target Space
+        explode: false
+        in: path
+        name: space
+        required: true
+        schema:
+          description: Name of the target Space
+          title: Space
+          type: string
+        style: simple
+      - description: Name of the target Block
+        explode: false
+        in: path
+        name: block
+        required: true
+        schema:
+          description: Name of the target Block
+          title: Block
+          type: string
+        style: simple
+      - description: ID of the target Reservation
+        explode: false
+        in: path
+        name: reservation
+        required: true
+        schema:
+          description: ID of the target Reservation
+          title: Reservation
+          type: string
+        style: simple
+      - description: Azure Bearer token
+        explode: false
+        in: header
+        name: authorization
+        required: false
+        schema:
+          description: Azure Bearer token
+          title: Authorization
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationExpand'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Block Reservation
+      tags:
+      - spaces
+  /api/status:
+    get:
+      operationId: get_status_api_status_get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+          description: Successful Response
+      summary: Get Azure IPAM Status
+      tags:
+      - status
+components:
+  schemas:
+    Admin:
+      description: DOCSTRING
+      example:
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: User
+        email: email
+      properties:
+        type:
+          enum:
+          - User
+          - Principal
+          title: Type
+          type: string
+        name:
+          title: Name
+          type: string
+        email:
+          format: email
+          nullable: true
+          type: string
+        id:
+          format: uuid
+          title: Id
+          type: string
+      required:
+      - id
+      - name
+      - type
+      title: Admin
+    Block:
+      description: DOCSTRING
+      example:
+        resv:
+        - settledOn: 2.3021358869347655
+          createdBy: createdBy
+          cidr: cidr
+          settledBy: settledBy
+          id: id
+          createdOn: 5.637376656633329
+          desc: desc
+          status: status
+        - settledOn: 2.3021358869347655
+          createdBy: createdBy
+          cidr: cidr
+          settledBy: settledBy
+          id: id
+          createdOn: 5.637376656633329
+          desc: desc
+          status: status
+        name: name
+        cidr: cidr
+        externals:
+        - name: name
+          cidr: cidr
+          subnets:
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          desc: desc
+        - name: name
+          cidr: cidr
+          subnets:
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          desc: desc
+        vnets:
+        - active: true
+          id: id
+        - active: true
+          id: id
+      properties:
+        name:
+          title: Name
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        vnets:
+          items:
+            $ref: '#/components/schemas/VNet'
+          type: array
+        externals:
+          items:
+            $ref: '#/components/schemas/ExtNet'
+          type: array
+        resv:
+          items:
+            $ref: '#/components/schemas/Reservation'
+          type: array
+      required:
+      - cidr
+      - externals
+      - name
+      - resv
+      - vnets
+      title: Block
+    BlockBasic:
+      description: DOCSTRING
+      example:
+        resv:
+        - settledOn: 2.3021358869347655
+          createdBy: createdBy
+          cidr: cidr
+          settledBy: settledBy
+          id: id
+          createdOn: 5.637376656633329
+          desc: desc
+          status: status
+        - settledOn: 2.3021358869347655
+          createdBy: createdBy
+          cidr: cidr
+          settledBy: settledBy
+          id: id
+          createdOn: 5.637376656633329
+          desc: desc
+          status: status
+        name: name
+        cidr: cidr
+        externals:
+        - name: name
+          cidr: cidr
+          subnets:
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          desc: desc
+        - name: name
+          cidr: cidr
+          subnets:
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          desc: desc
+        vnets:
+        - active: true
+          id: id
+        - active: true
+          id: id
+      properties:
+        name:
+          title: Name
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        vnets:
+          items:
+            $ref: '#/components/schemas/VNet'
+          type: array
+        externals:
+          items:
+            $ref: '#/components/schemas/ExtNet'
+          type: array
+        resv:
+          items:
+            $ref: '#/components/schemas/Reservation'
+          type: array
+      required:
+      - cidr
+      - externals
+      - name
+      - resv
+      - vnets
+      title: BlockBasic
+    BlockBasicUtil:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        vnets:
+          items:
+            $ref: '#/components/schemas/VNet'
+          type: array
+        externals:
+          items:
+            $ref: '#/components/schemas/ExtNet'
+          type: array
+        resv:
+          items:
+            $ref: '#/components/schemas/Reservation'
+          type: array
+        size:
+          title: Size
+          type: integer
+        used:
+          title: Used
+          type: integer
+      required:
+      - cidr
+      - externals
+      - name
+      - resv
+      - size
+      - used
+      - vnets
+      title: BlockBasicUtil
+    BlockCIDRReq:
+      description: DOCSTRING
+      example:
+        reverse_search: true
+        size: 0
+        smallest_cidr: true
+        cidr: cidr
+        desc: desc
+      properties:
+        size:
+          nullable: true
+          type: integer
+        cidr:
+          nullable: true
+          pattern: x.x.x.x/x
+          type: string
+        desc:
+          nullable: true
+          type: string
+        reverse_search:
+          nullable: true
+          type: boolean
+        smallest_cidr:
+          nullable: true
+          type: boolean
+      title: BlockCIDRReq
+    BlockExpand:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        vnets:
+          items:
+            $ref: '#/components/schemas/VNetExpand'
+          type: array
+        externals:
+          items:
+            $ref: '#/components/schemas/ExtNet'
+          type: array
+        resv:
+          items:
+            $ref: '#/components/schemas/Reservation'
+          type: array
+      required:
+      - cidr
+      - externals
+      - name
+      - resv
+      - vnets
+      title: BlockExpand
+    BlockExpandUtil:
+      description: DOCSTRING
+      example:
+        resv:
+        - settledOn: 2.3021358869347655
+          createdBy: createdBy
+          cidr: cidr
+          settledBy: settledBy
+          id: id
+          createdOn: 5.637376656633329
+          desc: desc
+          status: status
+        - settledOn: 2.3021358869347655
+          createdBy: createdBy
+          cidr: cidr
+          settledBy: settledBy
+          id: id
+          createdOn: 5.637376656633329
+          desc: desc
+          status: status
+        size: 7
+        name: name
+        cidr: cidr
+        externals:
+        - name: name
+          cidr: cidr
+          subnets:
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          desc: desc
+        - name: name
+          cidr: cidr
+          subnets:
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          - endpoints:
+            - ip: ip
+              name: name
+              desc: desc
+            - ip: ip
+              name: name
+              desc: desc
+            name: name
+            cidr: cidr
+            desc: desc
+          desc: desc
+        used: 9
+        vnets:
+        - subscription_id: subscription_id
+          tenant_id: tenant_id
+          prefixes:
+          - prefixes
+          - prefixes
+          resource_group: resource_group
+          size: 1
+          name: name
+          subnets:
+          - size: 0
+            prefix: prefix
+            name: name
+            used: 6
+          - size: 0
+            prefix: prefix
+            name: name
+            used: 6
+          id: id
+          used: 5
+        - subscription_id: subscription_id
+          tenant_id: tenant_id
+          prefixes:
+          - prefixes
+          - prefixes
+          resource_group: resource_group
+          size: 1
+          name: name
+          subnets:
+          - size: 0
+            prefix: prefix
+            name: name
+            used: 6
+          - size: 0
+            prefix: prefix
+            name: name
+            used: 6
+          id: id
+          used: 5
+      properties:
+        name:
+          title: Name
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        vnets:
+          items:
+            $ref: '#/components/schemas/VNetExpandUtil'
+          type: array
+        externals:
+          items:
+            $ref: '#/components/schemas/ExtNet'
+          type: array
+        resv:
+          items:
+            $ref: '#/components/schemas/Reservation'
+          type: array
+        size:
+          title: Size
+          type: integer
+        used:
+          title: Used
+          type: integer
+      required:
+      - cidr
+      - externals
+      - name
+      - resv
+      - size
+      - used
+      - vnets
+      title: BlockExpandUtil
+    BlockReq:
+      description: DOCSTRING
+      example:
+        name: name
+        cidr: cidr
+      properties:
+        name:
+          title: Name
+          type: string
+        cidr:
+          pattern: x.x.x.x/x
+          title: Cidr
+          type: string
+      required:
+      - cidr
+      - name
+      title: BlockReq
+    BlockUtil:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        vnets:
+          items:
+            $ref: '#/components/schemas/VNet'
+          type: array
+        externals:
+          items:
+            $ref: '#/components/schemas/ExtNet'
+          type: array
+        resv:
+          items:
+            $ref: '#/components/schemas/Reservation'
+          type: array
+        size:
+          title: Size
+          type: integer
+        used:
+          title: Used
+          type: integer
+      required:
+      - cidr
+      - externals
+      - name
+      - resv
+      - size
+      - used
+      - vnets
+      title: BlockUtil
+    CIDRCheckReq:
+      description: DOCSTRING
+      example:
+        cidr: cidr
+      properties:
+        cidr:
+          pattern: x.x.x.x/x
+          title: Cidr
+          type: string
+      required:
+      - cidr
+      title: CIDRCheckReq
+    CIDRCheckRes:
+      description: DOCSTRING
+      example:
+        subscription_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        tenant_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        prefixes:
+        - prefixes
+        - prefixes
+        resource_group: resource_group
+        name: name
+        containers:
+        - block: block
+          space: space
+        - block: block
+          space: space
+        id: id
+      properties:
+        name:
+          title: Name
+          type: string
+        id:
+          title: Id
+          type: string
+        resource_group:
+          title: Resource Group
+          type: string
+        subscription_id:
+          format: uuid
+          title: Subscription Id
+          type: string
+        tenant_id:
+          format: uuid
+          title: Tenant Id
+          type: string
+        prefixes:
+          items:
+            pattern: x.x.x.x/x
+            type: string
+          type: array
+        containers:
+          items:
+            $ref: '#/components/schemas/CIDRContainer'
+          type: array
+      required:
+      - containers
+      - id
+      - name
+      - prefixes
+      - resource_group
+      - subscription_id
+      - tenant_id
+      title: CIDRCheckRes
+    CIDRContainer:
+      example:
+        block: block
+        space: space
+      properties:
+        space:
+          title: Space
+          type: string
+        block:
+          title: Block
+          type: string
+      required:
+      - block
+      - space
+      title: CIDRContainer
+    ExtEndpoint:
+      description: DOCSTRING
+      example:
+        ip: ip
+        name: name
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        ip:
+          title: Ip
+          type: string
+      required:
+      - desc
+      - ip
+      - name
+      title: ExtEndpoint
+    ExtEndpointReq:
+      description: DOCSTRING
+      example:
+        ip: ip
+        name: name
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        ip:
+          nullable: true
+          pattern: x.x.x.x
+          type: string
+      required:
+      - desc
+      - ip
+      - name
+      title: ExtEndpointReq
+    ExtNet:
+      description: DOCSTRING
+      example:
+        name: name
+        cidr: cidr
+        subnets:
+        - endpoints:
+          - ip: ip
+            name: name
+            desc: desc
+          - ip: ip
+            name: name
+            desc: desc
+          name: name
+          cidr: cidr
+          desc: desc
+        - endpoints:
+          - ip: ip
+            name: name
+            desc: desc
+          - ip: ip
+            name: name
+            desc: desc
+          name: name
+          cidr: cidr
+          desc: desc
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        cidr:
+          pattern: x.x.x.x/x
+          title: Cidr
+          type: string
+        subnets:
+          items:
+            $ref: '#/components/schemas/ExtSubnet'
+          type: array
+      required:
+      - cidr
+      - desc
+      - name
+      - subnets
+      title: ExtNet
+    ExtNetExpand:
+      description: DOCSTRING
+      example:
+        name: name
+        block: block
+        cidr: cidr
+        subnets:
+        - endpoints:
+          - ip: ip
+            name: name
+            desc: desc
+          - ip: ip
+            name: name
+            desc: desc
+          name: name
+          cidr: cidr
+          desc: desc
+        - endpoints:
+          - ip: ip
+            name: name
+            desc: desc
+          - ip: ip
+            name: name
+            desc: desc
+          name: name
+          cidr: cidr
+          desc: desc
+        space: space
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        space:
+          title: Space
+          type: string
+        block:
+          title: Block
+          type: string
+        cidr:
+          pattern: x.x.x.x/x
+          title: Cidr
+          type: string
+        subnets:
+          items:
+            $ref: '#/components/schemas/ExtSubnet'
+          type: array
+      required:
+      - block
+      - cidr
+      - desc
+      - name
+      - space
+      - subnets
+      title: ExtNetExpand
+    ExtNetReq:
+      description: DOCSTRING
+      example:
+        size: 0
+        name: name
+        cidr: cidr
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          nullable: true
+          type: string
+        cidr:
+          nullable: true
+          pattern: x.x.x.x/x
+          type: string
+        size:
+          nullable: true
+          type: integer
+      required:
+      - name
+      title: ExtNetReq
+    ExtSubnet:
+      description: DOCSTRING
+      example:
+        endpoints:
+        - ip: ip
+          name: name
+          desc: desc
+        - ip: ip
+          name: name
+          desc: desc
+        name: name
+        cidr: cidr
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        endpoints:
+          items:
+            $ref: '#/components/schemas/ExtEndpoint'
+          type: array
+      required:
+      - cidr
+      - desc
+      - endpoints
+      - name
+      title: ExtSubnet
+    ExtSubnetExpand:
+      description: DOCSTRING
+      example:
+        external: external
+        endpoints:
+        - ip: ip
+          name: name
+          desc: desc
+        - ip: ip
+          name: name
+          desc: desc
+        name: name
+        block: block
+        cidr: cidr
+        space: space
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        space:
+          title: Space
+          type: string
+        block:
+          title: Block
+          type: string
+        external:
+          title: External
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        endpoints:
+          items:
+            $ref: '#/components/schemas/ExtEndpoint'
+          type: array
+      required:
+      - block
+      - cidr
+      - desc
+      - endpoints
+      - external
+      - name
+      - space
+      title: ExtSubnetExpand
+    ExtSubnetReq:
+      description: DOCSTRING
+      example:
+        size: 0
+        name: name
+        cidr: cidr
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          nullable: true
+          type: string
+        cidr:
+          nullable: true
+          pattern: x.x.x.x/x
+          type: string
+        size:
+          nullable: true
+          type: integer
+      required:
+      - name
+      title: ExtSubnetReq
+    HTTPValidationError:
+      example:
+        detail:
+        - msg: msg
+          loc:
+          - ValidationError_loc_inner
+          - ValidationError_loc_inner
+          type: type
+        - msg: msg
+          loc:
+          - ValidationError_loc_inner
+          - ValidationError_loc_inner
+          type: type
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+      title: HTTPValidationError
+    ImageDetails:
+      description: DOCSTRING
+      example:
+        image_pretty_name: image_pretty_name
+        image_id: image_id
+        image_version: image_version
+        image_codename: image_codename
+      properties:
+        image_id:
+          title: Image Id
+          type: string
+        image_version:
+          title: Image Version
+          type: string
+        image_codename:
+          title: Image Codename
+          type: string
+        image_pretty_name:
+          title: Image Pretty Name
+          type: string
+      required:
+      - image_codename
+      - image_id
+      - image_pretty_name
+      - image_version
+      title: ImageDetails
+    JSONPatch:
+      description: DOCSTRING
+      example:
+        op: op
+        path: path
+        value: ""
+      properties:
+        op:
+          title: Op
+          type: string
+        path:
+          title: Path
+          type: string
+        value: {}
+      required:
+      - op
+      - path
+      title: JSONPatch
+    Network:
+      description: DOCSTRING
+      example:
+        active: true
+        id: id
+      properties:
+        id:
+          title: Id
+          type: string
+        active:
+          nullable: true
+          type: boolean
+      required:
+      - id
+      title: Network
+    NetworkExpand:
+      description: DOCSTRING
+      example:
+        subscription_id: subscription_id
+        tenant_id: tenant_id
+        prefixes:
+        - prefixes
+        - prefixes
+        resource_group: resource_group
+        name: name
+        id: id
+      properties:
+        name:
+          title: Name
+          type: string
+        id:
+          title: Id
+          type: string
+        prefixes:
+          items:
+            type: string
+          type: array
+        resource_group:
+          title: Resource Group
+          type: string
+        subscription_id:
+          title: Subscription Id
+          type: string
+        tenant_id:
+          title: Tenant Id
+          type: string
+      required:
+      - id
+      - name
+      - prefixes
+      - resource_group
+      - subscription_id
+      - tenant_id
+      title: NetworkExpand
+    NewSubnetCIDR:
+      description: DOCSTRING
+      example:
+        subscription_id: subscription_id
+        vnet_name: vnet_name
+        resource_group: resource_group
+        cidr: cidr
+      properties:
+        vnet_name:
+          title: Vnet Name
+          type: string
+        resource_group:
+          title: Resource Group
+          type: string
+        subscription_id:
+          title: Subscription Id
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+      required:
+      - cidr
+      - resource_group
+      - subscription_id
+      - vnet_name
+      title: NewSubnetCIDR
+    NewVNetCIDR:
+      description: DOCSTRING
+      example:
+        block: block
+        cidr: cidr
+        space: space
+      properties:
+        space:
+          title: Space
+          type: string
+        block:
+          title: Block
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+      required:
+      - block
+      - cidr
+      - space
+      title: NewVNetCIDR
+    Reservation:
+      description: DOCSTRING
+      example:
+        settledOn: 2.3021358869347655
+        createdBy: createdBy
+        cidr: cidr
+        settledBy: settledBy
+        id: id
+        createdOn: 5.637376656633329
+        desc: desc
+        status: status
+      properties:
+        id:
+          title: Id
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        desc:
+          nullable: true
+          type: string
+        createdOn:
+          title: Createdon
+          type: number
+        createdBy:
+          title: Createdby
+          type: string
+        settledOn:
+          nullable: true
+          type: number
+        settledBy:
+          nullable: true
+          type: string
+        status:
+          title: Status
+          type: string
+      required:
+      - cidr
+      - createdBy
+      - createdOn
+      - id
+      - status
+      title: Reservation
+    ReservationExpand:
+      description: DOCSTRING
+      example:
+        settledOn: 6.027456183070403
+        createdBy: createdBy
+        block: block
+        cidr: cidr
+        settledBy: settledBy
+        id: id
+        tag: "{}"
+        createdOn: 0.8008281904610115
+        space: space
+        desc: desc
+        status: status
+      properties:
+        id:
+          title: Id
+          type: string
+        space:
+          nullable: true
+          type: string
+        block:
+          nullable: true
+          type: string
+        cidr:
+          title: Cidr
+          type: string
+        desc:
+          nullable: true
+          type: string
+        createdOn:
+          title: Createdon
+          type: number
+        createdBy:
+          title: Createdby
+          type: string
+        settledOn:
+          nullable: true
+          type: number
+        settledBy:
+          nullable: true
+          type: string
+        status:
+          title: Status
+          type: string
+        tag:
+          nullable: true
+          type: object
+      required:
+      - cidr
+      - createdBy
+      - createdOn
+      - id
+      - status
+      title: ReservationExpand
+    Space:
+      description: DOCSTRING
+      example:
+        blocks:
+        - resv:
+          - settledOn: 2.3021358869347655
+            createdBy: createdBy
+            cidr: cidr
+            settledBy: settledBy
+            id: id
+            createdOn: 5.637376656633329
+            desc: desc
+            status: status
+          - settledOn: 2.3021358869347655
+            createdBy: createdBy
+            cidr: cidr
+            settledBy: settledBy
+            id: id
+            createdOn: 5.637376656633329
+            desc: desc
+            status: status
+          name: name
+          cidr: cidr
+          externals:
+          - name: name
+            cidr: cidr
+            subnets:
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            desc: desc
+          - name: name
+            cidr: cidr
+            subnets:
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            desc: desc
+          vnets:
+          - active: true
+            id: id
+          - active: true
+            id: id
+        - resv:
+          - settledOn: 2.3021358869347655
+            createdBy: createdBy
+            cidr: cidr
+            settledBy: settledBy
+            id: id
+            createdOn: 5.637376656633329
+            desc: desc
+            status: status
+          - settledOn: 2.3021358869347655
+            createdBy: createdBy
+            cidr: cidr
+            settledBy: settledBy
+            id: id
+            createdOn: 5.637376656633329
+            desc: desc
+            status: status
+          name: name
+          cidr: cidr
+          externals:
+          - name: name
+            cidr: cidr
+            subnets:
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            desc: desc
+          - name: name
+            cidr: cidr
+            subnets:
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            desc: desc
+          vnets:
+          - active: true
+            id: id
+          - active: true
+            id: id
+        name: name
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        blocks:
+          items:
+            $ref: '#/components/schemas/Block'
+          type: array
+      required:
+      - blocks
+      - desc
+      - name
+      title: Space
+    SpaceBasic:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        blocks:
+          items:
+            $ref: '#/components/schemas/BlockBasic'
+          type: array
+      required:
+      - blocks
+      - desc
+      - name
+      title: SpaceBasic
+    SpaceBasicUtil:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        blocks:
+          items:
+            $ref: '#/components/schemas/BlockBasicUtil'
+          type: array
+        size:
+          title: Size
+          type: integer
+        used:
+          title: Used
+          type: integer
+      required:
+      - blocks
+      - desc
+      - name
+      - size
+      - used
+      title: SpaceBasicUtil
+    SpaceCIDRReq:
+      description: DOCSTRING
+      example:
+        reverse_search: true
+        size: 0
+        smallest_cidr: true
+        blocks:
+        - ""
+        - ""
+        desc: desc
+      properties:
+        blocks:
+          items: {}
+          type: array
+        size:
+          title: Size
+          type: integer
+        desc:
+          nullable: true
+          type: string
+        reverse_search:
+          nullable: true
+          type: boolean
+        smallest_cidr:
+          nullable: true
+          type: boolean
+      required:
+      - blocks
+      - size
+      title: SpaceCIDRReq
+    SpaceExpand:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        blocks:
+          items:
+            $ref: '#/components/schemas/BlockExpand'
+          type: array
+      required:
+      - blocks
+      - desc
+      - name
+      title: SpaceExpand
+    SpaceExpandUtil:
+      description: DOCSTRING
+      example:
+        size: 3
+        blocks:
+        - resv:
+          - settledOn: 2.3021358869347655
+            createdBy: createdBy
+            cidr: cidr
+            settledBy: settledBy
+            id: id
+            createdOn: 5.637376656633329
+            desc: desc
+            status: status
+          - settledOn: 2.3021358869347655
+            createdBy: createdBy
+            cidr: cidr
+            settledBy: settledBy
+            id: id
+            createdOn: 5.637376656633329
+            desc: desc
+            status: status
+          size: 7
+          name: name
+          cidr: cidr
+          externals:
+          - name: name
+            cidr: cidr
+            subnets:
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            desc: desc
+          - name: name
+            cidr: cidr
+            subnets:
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            desc: desc
+          used: 9
+          vnets:
+          - subscription_id: subscription_id
+            tenant_id: tenant_id
+            prefixes:
+            - prefixes
+            - prefixes
+            resource_group: resource_group
+            size: 1
+            name: name
+            subnets:
+            - size: 0
+              prefix: prefix
+              name: name
+              used: 6
+            - size: 0
+              prefix: prefix
+              name: name
+              used: 6
+            id: id
+            used: 5
+          - subscription_id: subscription_id
+            tenant_id: tenant_id
+            prefixes:
+            - prefixes
+            - prefixes
+            resource_group: resource_group
+            size: 1
+            name: name
+            subnets:
+            - size: 0
+              prefix: prefix
+              name: name
+              used: 6
+            - size: 0
+              prefix: prefix
+              name: name
+              used: 6
+            id: id
+            used: 5
+        - resv:
+          - settledOn: 2.3021358869347655
+            createdBy: createdBy
+            cidr: cidr
+            settledBy: settledBy
+            id: id
+            createdOn: 5.637376656633329
+            desc: desc
+            status: status
+          - settledOn: 2.3021358869347655
+            createdBy: createdBy
+            cidr: cidr
+            settledBy: settledBy
+            id: id
+            createdOn: 5.637376656633329
+            desc: desc
+            status: status
+          size: 7
+          name: name
+          cidr: cidr
+          externals:
+          - name: name
+            cidr: cidr
+            subnets:
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            desc: desc
+          - name: name
+            cidr: cidr
+            subnets:
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            - endpoints:
+              - ip: ip
+                name: name
+                desc: desc
+              - ip: ip
+                name: name
+                desc: desc
+              name: name
+              cidr: cidr
+              desc: desc
+            desc: desc
+          used: 9
+          vnets:
+          - subscription_id: subscription_id
+            tenant_id: tenant_id
+            prefixes:
+            - prefixes
+            - prefixes
+            resource_group: resource_group
+            size: 1
+            name: name
+            subnets:
+            - size: 0
+              prefix: prefix
+              name: name
+              used: 6
+            - size: 0
+              prefix: prefix
+              name: name
+              used: 6
+            id: id
+            used: 5
+          - subscription_id: subscription_id
+            tenant_id: tenant_id
+            prefixes:
+            - prefixes
+            - prefixes
+            resource_group: resource_group
+            size: 1
+            name: name
+            subnets:
+            - size: 0
+              prefix: prefix
+              name: name
+              used: 6
+            - size: 0
+              prefix: prefix
+              name: name
+              used: 6
+            id: id
+            used: 5
+        name: name
+        used: 2
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        blocks:
+          items:
+            $ref: '#/components/schemas/BlockExpandUtil'
+          type: array
+        size:
+          title: Size
+          type: integer
+        used:
+          title: Used
+          type: integer
+      required:
+      - blocks
+      - desc
+      - name
+      - size
+      - used
+      title: SpaceExpandUtil
+    SpaceReq:
+      description: DOCSTRING
+      example:
+        name: name
+        desc: desc
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+      required:
+      - desc
+      - name
+      title: SpaceReq
+    SpaceUtil:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        desc:
+          title: Desc
+          type: string
+        blocks:
+          items:
+            $ref: '#/components/schemas/BlockUtil'
+          type: array
+        size:
+          title: Size
+          type: integer
+        used:
+          title: Used
+          type: integer
+      required:
+      - blocks
+      - desc
+      - name
+      - size
+      - used
+      title: SpaceUtil
+    Status:
+      description: DOCSTRING
+      example:
+        container:
+          image_pretty_name: image_pretty_name
+          image_id: image_id
+          image_version: image_version
+          image_codename: image_codename
+        version: version
+        status: status
+      properties:
+        status:
+          title: Status
+          type: string
+        version:
+          title: Version
+          type: string
+        container:
+          $ref: '#/components/schemas/ImageDetails'
+      required:
+      - container
+      - status
+      - version
+      title: Status
+    Subnet:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        prefix:
+          title: Prefix
+          type: string
+      required:
+      - name
+      - prefix
+      title: Subnet
+    SubnetCIDRReq:
+      description: DOCSTRING
+      example:
+        reverse_search: true
+        size: 0
+        smallest_cidr: true
+        vnet_id: vnet_id
+      properties:
+        vnet_id:
+          title: Vnet Id
+          type: string
+        size:
+          title: Size
+          type: integer
+        reverse_search:
+          nullable: true
+          type: boolean
+        smallest_cidr:
+          nullable: true
+          type: boolean
+      required:
+      - size
+      - vnet_id
+      title: SubnetCIDRReq
+    SubnetUtil:
+      description: DOCSTRING
+      example:
+        size: 0
+        prefix: prefix
+        name: name
+        used: 6
+      properties:
+        name:
+          title: Name
+          type: string
+        prefix:
+          title: Prefix
+          type: string
+        size:
+          title: Size
+          type: integer
+        used:
+          title: Used
+          type: integer
+      required:
+      - name
+      - prefix
+      - size
+      - used
+      title: SubnetUtil
+    User:
+      description: DOCSTRING
+      example:
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        darkMode: true
+        apiRefresh: 0
+        isAdmin: true
+      properties:
+        id:
+          format: uuid
+          title: Id
+          type: string
+        darkMode:
+          title: Darkmode
+          type: boolean
+        apiRefresh:
+          title: Apirefresh
+          type: integer
+        isAdmin:
+          title: Isadmin
+          type: boolean
+      required:
+      - apiRefresh
+      - darkMode
+      - id
+      - isAdmin
+      title: User
+    UserExpand:
+      description: DOCSTRING
+      example:
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        darkMode: true
+        apiRefresh: 0
+        isAdmin: true
+        views:
+          key:
+            values:
+              key: "{}"
+            sort: "{}"
+            order:
+            - order
+            - order
+      properties:
+        id:
+          format: uuid
+          title: Id
+          type: string
+        darkMode:
+          title: Darkmode
+          type: boolean
+        apiRefresh:
+          title: Apirefresh
+          type: integer
+        isAdmin:
+          title: Isadmin
+          type: boolean
+        views:
+          additionalProperties:
+            $ref: '#/components/schemas/ViewSettings'
+          title: Views
+      required:
+      - apiRefresh
+      - darkMode
+      - id
+      - isAdmin
+      - views
+      title: UserExpand
+    VNet:
+      description: DOCSTRING
+      example:
+        active: true
+        id: id
+      properties:
+        id:
+          title: Id
+          type: string
+        active:
+          nullable: true
+          type: boolean
+      required:
+      - id
+      title: VNet
+    VNetCIDRReq:
+      description: DOCSTRING
+      example:
+        reverse_search: true
+        size: 0
+        smallest_cidr: true
+        blocks:
+        - blocks
+        - blocks
+        space: space
+      properties:
+        space:
+          title: Space
+          type: string
+        blocks:
+          items:
+            type: string
+          type: array
+        size:
+          title: Size
+          type: integer
+        reverse_search:
+          nullable: true
+          type: boolean
+        smallest_cidr:
+          nullable: true
+          type: boolean
+      required:
+      - blocks
+      - size
+      - space
+      title: VNetCIDRReq
+    VNetExpand:
+      description: DOCSTRING
+      properties:
+        name:
+          title: Name
+          type: string
+        id:
+          title: Id
+          type: string
+        prefixes:
+          items:
+            type: string
+          type: array
+        subnets:
+          items:
+            $ref: '#/components/schemas/Subnet'
+          type: array
+        resource_group:
+          title: Resource Group
+          type: string
+        subscription_id:
+          title: Subscription Id
+          type: string
+        tenant_id:
+          title: Tenant Id
+          type: string
+      required:
+      - id
+      - name
+      - prefixes
+      - resource_group
+      - subnets
+      - subscription_id
+      - tenant_id
+      title: VNetExpand
+    VNetExpandUtil:
+      description: DOCSTRING
+      example:
+        subscription_id: subscription_id
+        tenant_id: tenant_id
+        prefixes:
+        - prefixes
+        - prefixes
+        resource_group: resource_group
+        size: 1
+        name: name
+        subnets:
+        - size: 0
+          prefix: prefix
+          name: name
+          used: 6
+        - size: 0
+          prefix: prefix
+          name: name
+          used: 6
+        id: id
+        used: 5
+      properties:
+        name:
+          title: Name
+          type: string
+        id:
+          title: Id
+          type: string
+        prefixes:
+          items:
+            type: string
+          type: array
+        subnets:
+          items:
+            $ref: '#/components/schemas/SubnetUtil'
+          type: array
+        resource_group:
+          title: Resource Group
+          type: string
+        subscription_id:
+          title: Subscription Id
+          type: string
+        tenant_id:
+          title: Tenant Id
+          type: string
+        size:
+          title: Size
+          type: integer
+        used:
+          title: Used
+          type: integer
+      required:
+      - id
+      - name
+      - prefixes
+      - resource_group
+      - size
+      - subnets
+      - subscription_id
+      - tenant_id
+      - used
+      title: VNetExpandUtil
+    ValidationError:
+      example:
+        msg: msg
+        loc:
+        - ValidationError_loc_inner
+        - ValidationError_loc_inner
+        type: type
+      properties:
+        loc:
+          items:
+            $ref: '#/components/schemas/ValidationError_loc_inner'
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ViewSettings:
+      example:
+        values:
+          key: "{}"
+        sort: "{}"
+        order:
+        - order
+        - order
+      properties:
+        values:
+          additionalProperties:
+            type: object
+          title: Values
+        order:
+          items:
+            type: string
+          type: array
+        sort:
+          nullable: true
+          type: object
+      required:
+      - order
+      - values
+      title: ViewSettings
+    Response_Get_User_Api_Users_Me_Get:
+      anyOf:
+      - $ref: '#/components/schemas/UserExpand'
+      - $ref: '#/components/schemas/User'
+      title: Response Get User Api Users Me Get
+    Response_Get_Spaces_Api_Spaces_Get:
+      anyOf:
+      - items:
+          $ref: '#/components/schemas/SpaceExpandUtil'
+      - items:
+          $ref: '#/components/schemas/SpaceExpand'
+      - items:
+          $ref: '#/components/schemas/SpaceUtil'
+      - items:
+          $ref: '#/components/schemas/Space'
+      - items:
+          $ref: '#/components/schemas/SpaceBasicUtil'
+      - items:
+          $ref: '#/components/schemas/SpaceBasic'
+      title: Response Get Spaces Api Spaces Get
+    Response_Get_Space_Api_Spaces__Space__Get:
+      anyOf:
+      - $ref: '#/components/schemas/SpaceExpandUtil'
+      - $ref: '#/components/schemas/SpaceExpand'
+      - $ref: '#/components/schemas/SpaceUtil'
+      - $ref: '#/components/schemas/Space'
+      - $ref: '#/components/schemas/SpaceBasicUtil'
+      - $ref: '#/components/schemas/SpaceBasic'
+      title: Response Get Space Api Spaces  Space  Get
+    Response_Get_Blocks_Api_Spaces__Space__Blocks_Get:
+      anyOf:
+      - items:
+          $ref: '#/components/schemas/BlockExpandUtil'
+      - items:
+          $ref: '#/components/schemas/BlockExpand'
+      - items:
+          $ref: '#/components/schemas/BlockUtil'
+      - items:
+          $ref: '#/components/schemas/Block'
+      - items:
+          $ref: '#/components/schemas/BlockBasicUtil'
+      - items:
+          $ref: '#/components/schemas/BlockBasic'
+      title: Response Get Blocks Api Spaces  Space  Blocks Get
+    Response_Get_Block_Api_Spaces__Space__Blocks__Block__Get:
+      anyOf:
+      - $ref: '#/components/schemas/BlockExpandUtil'
+      - $ref: '#/components/schemas/BlockExpand'
+      - $ref: '#/components/schemas/BlockUtil'
+      - $ref: '#/components/schemas/Block'
+      - $ref: '#/components/schemas/BlockBasicUtil'
+      - $ref: '#/components/schemas/BlockBasic'
+      title: Response Get Block Api Spaces  Space  Blocks  Block  Get
+    Response_Available_Block_Nets_Api_Spaces__Space__Blocks__Block__Available_Get:
+      anyOf:
+      - items:
+          $ref: '#/components/schemas/NetworkExpand'
+      - items:
+          type: string
+      title: Response Available Block Nets Api Spaces  Space  Blocks  Block  Available
+        Get
+    Response_Get_Block_Nets_Api_Spaces__Space__Blocks__Block__Networks_Get:
+      anyOf:
+      - items:
+          $ref: '#/components/schemas/NetworkExpand'
+      - items:
+          $ref: '#/components/schemas/Network'
+      title: Response Get Block Nets Api Spaces  Space  Blocks  Block  Networks Get
+    ValidationError_loc_inner:
+      anyOf:
+      - type: string
+      - type: integer

@@ -1,12 +1,14 @@
+
 # Azure IPAM Terraform Provider
 
 This is a Terraform provider for Azure IP Address Management (IPAM). It allows you to manage IP address spaces, blocks, and reservations using Terraform.
 
 ## Requirements
 
-- [Terraform](https://www.terraform.io/downloads.html) 0.12.x or later
+- [Terraform](https://www.terraform.io/downloads.html) 1.9.x or later
 - [Go](https://golang.org/doc/install) 1.23 or later (for development)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for obtaining authentication token)
+- [Azure PowerShell](https://docs.microsoft.com/en-us/powershell/azure/new-azureps-module-az)
 
 ## Building The Provider
 
@@ -22,35 +24,66 @@ go install
 
 ### Authentication
 
-To use this provider, you need to authenticate with Azure. You can obtain an Azure AD token using the Azure CLI. Here's how:
+To use this provider, you need to authenticate with Azure IPAM and cache the authentication token and API endpoint for future use.
 
-1. Ensure you have the Azure CLI installed and you're logged in:
+### Step 1: PowerShell Script for Authentication, App Service Discovery, and Token Caching
 
-   ```sh
-   az login
-   ```
+Run the following **PowerShell** script to authenticate, discover the `Application ID` and App Service URL, and generate an Azure AD token. The script will save the token and API endpoint in `~/.ipam/.token`.
 
-2. If you have multiple subscriptions, select the one you want to use:
+```powershell
+# Step 1: Authenticate with Azure
+Connect-AzAccount
 
-   ```sh
-   az account set --subscription="SUBSCRIPTION_ID"
-   ```
+# Step 2: Discover the Application ID for the ipam-engine-app
+$engineAppName = "ipam-engine-app"
+$engineApp = Get-AzADApplication -Filter "DisplayName eq '$engineAppName'"
+$engineAppClientId = $engineApp.AppId
 
-3. Obtain an access token:
+# Step 3: Generate the Azure AD token
+$accessToken = (Get-AzAccessToken -ResourceUrl "api://$engineAppClientId").Token
 
-   ```sh
-   export AZURE_IPAM_TOKEN=$(az account get-access-token --resource="https://management.azure.com/" --query accessToken -o tsv)
-   ```
+# Step 4: Discover the App Service URL that starts with 'ipam'
+$appServiceUrl = az webapp list --query "[?starts_with(name, 'ipam')].defaultHostName" -o tsv
 
-   Replace `https://management.azure.com/` with the appropriate resource URL if your IPAM API uses a different resource.
+# Step 5: Create a folder ~/.ipam if it doesn't exist
+$ipamFolderPath = "$HOME/.ipam"
+if (!(Test-Path -Path $ipamFolderPath)) {
+    New-Item -Path $ipamFolderPath -ItemType Directory
+}
 
-4. Set the API endpoint:
+# Step 6: Write the token and API endpoint to ~/.ipam/.token
+$tokenFilePath = "$ipamFolderPath/.token"
+$tokenContent = @"
+AZURE_IPAM_TOKEN=$accessToken
+AZURE_IPAM_API_ENDPOINT=https://$appServiceUrl
+"@
+Set-Content -Path $tokenFilePath -Value $tokenContent
 
-   ```sh
-   export AZURE_IPAM_API_ENDPOINT="https://your-api-endpoint.com"
-   ```
+# Confirmation message
+Write-Host "Token and API endpoint saved to $tokenFilePath"
+```
 
-Now you can use the provider in your Terraform configuration:
+### Step 2: Bash Script for Loading Cached Token and API Endpoint
+
+After running the PowerShell script, you can load the token and API endpoint from the cached file in `~/.ipam/.token` in **Bash**.
+
+```bash
+# Load the token and API endpoint from the cache
+if [ -f ~/.ipam/.token ]; then
+    source ~/.ipam/.token
+    echo "Token and API endpoint loaded from ~/.ipam/.token"
+else
+    echo "Token file not found. Please run the PowerShell script to authenticate and cache the token."
+fi
+
+# Verify that the environment variables are set
+echo "Bash environment variables for provider authentications set:"
+env | grep AZURE_IPAM
+```
+
+### Step 3: Use the Provider in Terraform
+
+Once the token and API endpoint are loaded, you can use the provider in your Terraform configuration:
 
 ```hcl
 terraform {
@@ -68,8 +101,8 @@ Alternatively, you can provide the token and API endpoint directly in the provid
 
 ```hcl
 provider "azureipam" {
-  api_endpoint = "https://your-api-endpoint.com"
-  token        = "your-azure-ad-token"
+  api_endpoint = "${env.AZURE_IPAM_API_ENDPOINT}"
+  token        = "${env.AZURE_IPAM_TOKEN}"
 }
 ```
 
@@ -129,10 +162,12 @@ $ TF_ACC=1 go test ./... -v
 Make sure to set the required environment variables before running the tests:
 
 ```sh
-export AZURE_IPAM_API_ENDPOINT="https://your-api-endpoint.com"
+export AZURE_IPAM_API_ENDPOINT="https://your-ipam-instance.azurewebsites.net"
 export AZURE_IPAM_TOKEN="your-azure-ad-token"
 ```
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
