@@ -1,202 +1,21 @@
 package client
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"time"
+    "net/http"
 )
 
-// Client represents the Azure IPAM API client
+// Client is the structure for the Azure IPAM API client
 type Client struct {
-	Token      string
-	BaseURL    string
-	HTTPClient *http.Client
+    BaseURL    string
+    Token      string
+    HTTPClient *http.Client
 }
 
-// NewClient creates a new Azure IPAM API client with the given token and base URL
-func NewClient(token, baseURL string) *Client {
-	return &Client{
-		Token:   token,
-		BaseURL: baseURL,
-		HTTPClient: &http.Client{
-			Timeout: 30 * time.Second,
-		},
-	}
-}
-
-// SetHTTPClient allows setting a custom HTTP client (useful for testing)
-func (c *Client) SetHTTPClient(httpClient *http.Client) {
-	c.HTTPClient = httpClient
-}
-
-// makeRequest handles making an HTTP request with proper error handling and logging
-func (c *Client) makeRequest(method, endpoint string, body interface{}) (*http.Response, error) {
-	// Construct the URL for the API endpoint
-	url := fmt.Sprintf("%s%s", c.BaseURL, endpoint)
-
-	// Marshal the request body, if provided
-	var reqBody []byte
-	var err error
-	if body != nil {
-		reqBody, err = json.Marshal(body)
-		if err != nil {
-			return nil, fmt.Errorf("error marshaling request body: %w", err)
-		}
-	}
-
-	// Create a new HTTP request
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return nil, fmt.Errorf("error creating request: %w", err)
-	}
-
-	// Set headers
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
-	req.Header.Set("Content-Type", "application/json")
-
-	// Log the request for debugging purposes
-	log.Printf("[DEBUG] %s request to %s", method, url)
-	if reqBody != nil {
-		log.Printf("[DEBUG] Request body: %s", reqBody)
-	}
-
-	// Send the HTTP request
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error making request: %w", err)
-	}
-
-	// Log the response status for debugging purposes
-	log.Printf("[DEBUG] Response status: %d", resp.StatusCode)
-
-	// Check for non-2xx status codes and return an error
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		defer resp.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
-		return nil, fmt.Errorf("received non-2xx response: %d, body: %s", resp.StatusCode, string(body))
-	}
-
-	return resp, nil
-}
-
-// UpdateSpace updates an existing space in the Azure IPAM API by its ID
-func (c *Client) UpdateSpace(id string, desc string) (*Space, error) {
-	// Create the payload for the update
-	payload := map[string]interface{}{
-		"desc": desc,  // Update only the description, adjust based on API requirements
-	}
-
-	// Marshal the payload to JSON
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("error marshaling update payload: %w", err)
-	}
-
-	// Create the request URL (assuming /api/spaces/{id} is the correct endpoint for updating)
-	url := fmt.Sprintf("%s/api/spaces/%s", c.BaseURL, id)
-
-	// Make the API request
-	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(body))  // Use PATCH for updates
-	if err != nil {
-		return nil, fmt.Errorf("error creating update request: %w", err)
-	}
-
-	// Set the headers
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
-	req.Header.Set("Content-Type", "application/json")
-
-	// Send the request
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error sending update request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Check for non-2xx status codes
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, fmt.Errorf("received non-2xx status code: %d", resp.StatusCode)
-	}
-
-	// Decode the response into the Space struct
-	var updatedSpace Space
-	if err := json.NewDecoder(resp.Body).Decode(&updatedSpace); err != nil {
-		return nil, fmt.Errorf("error decoding update response: %w", err)
-	}
-
-	return &updatedSpace, nil
-}
-
-// CreateSpace creates a new space in the Azure IPAM API
-func (c *Client) CreateSpace(name, desc string) (*Space, error) {
-	space := Space{
-		Name: name,
-		Desc: desc,
-	}
-
-	// Make the API request
-	resp, err := c.makeRequest("POST", "/api/spaces", space)
-	if err != nil {
-		return nil, fmt.Errorf("error creating space: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Parse the response into the Space struct
-	var createdSpace Space
-	if err := json.NewDecoder(resp.Body).Decode(&createdSpace); err != nil {
-		return nil, fmt.Errorf("error decoding create space response: %w", err)
-	}
-
-	return &createdSpace, nil
-}
-
-// ListSpaces retrieves all spaces from the Azure IPAM API
-func (c *Client) ListSpaces() ([]Space, error) {
-	// Make the API request
-	resp, err := c.makeRequest("GET", "/api/spaces", nil)
-	if err != nil {
-		return nil, fmt.Errorf("error listing spaces: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Parse the response into a slice of Space structs
-	var spaces []Space
-	if err := json.NewDecoder(resp.Body).Decode(&spaces); err != nil {
-		return nil, fmt.Errorf("error decoding list spaces response: %w", err)
-	}
-
-	return spaces, nil
-}
-
-// GetSpace retrieves a specific space by its ID from the Azure IPAM API
-func (c *Client) GetSpace(id string) (*Space, error) {
-	// Make the API request
-	resp, err := c.makeRequest("GET", fmt.Sprintf("/api/spaces/%s", id), nil)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving space: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Parse the response into the Space struct
-	var space Space
-	if err := json.NewDecoder(resp.Body).Decode(&space); err != nil {
-		return nil, fmt.Errorf("error decoding get space response: %w", err)
-	}
-
-	return &space, nil
-}
-
-// DeleteSpace deletes a specific space by its ID from the Azure IPAM API
-func (c *Client) DeleteSpace(id string) error {
-	// Make the API request
-	resp, err := c.makeRequest("DELETE", fmt.Sprintf("/api/spaces/%s", id), nil)
-	if err != nil {
-		return fmt.Errorf("error deleting space: %w", err)
-	}
-	defer resp.Body.Close()
-
-	return nil
+// NewClient initializes and returns a new API client
+func NewClient(baseURL, token string) *Client {
+    return &Client{
+        BaseURL:    baseURL,
+        Token:      token,
+        HTTPClient: &http.Client{},
+    }
 }
