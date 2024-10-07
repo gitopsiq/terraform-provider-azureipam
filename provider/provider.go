@@ -36,19 +36,23 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-    var diags diag.Diagnostics
+	var diags diag.Diagnostics
 
-    baseURL := d.Get("base_url").(string)
-    token := d.Get("api_token").(string)
+	baseURL := d.Get("base_url").(string)
+	token := d.Get("api_token").(string)
 
-    // Initialize the client
-    c := client.NewClient(baseURL, token)
+	log.Printf("[DEBUG] API Token: %s", token)  // Debug log for token
+	log.Printf("[DEBUG] Base URL: %s", baseURL)  // Debug log for base URL
 
-    if c == nil {
-        return nil, diag.Errorf("Unable to create Azure IPAM client")
-    }
+	// Initialize the client with token and base URL
+	c := client.NewClient(baseURL, token)
 
-    log.Printf("[INFO] Azure IPAM Client configured with base URL: %s", baseURL)
+	if c == nil {
+			return nil, diag.Errorf("Unable to create Azure IPAM client")
+	}
 
-    return c, diags
+	log.Printf("[INFO] Azure IPAM Client configured with base URL: %s", baseURL)
+
+	return c, diags
 }
+
