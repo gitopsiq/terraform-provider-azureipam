@@ -51,7 +51,7 @@ if (!(Test-Path -Path $ipamFolderPath)) {
     New-Item -Path $ipamFolderPath -ItemType Directory
 }
 
-# Step 6: Write the token and API endpoint to ~/.ipam/.token
+# Step 6: Write the token and API endpoint to ~/.ipam/.token so that we can easly load it in bash
 $tokenFilePath = "$ipamFolderPath/.token"
 $tokenContent = @"
 AZURE_IPAM_TOKEN=$accessToken
@@ -59,8 +59,12 @@ AZURE_IPAM_API_ENDPOINT=https://$appServiceUrl
 "@
 Set-Content -Path $tokenFilePath -Value $tokenContent
 
+# Step 7: Set the environment variables in the current PowerShell session in case you want to run the tests from PowerShell
+$env:AZURE_IPAM_TOKEN = $accessToken
+$env:AZURE_IPAM_API_ENDPOINT = "https://$appServiceUrl"
+
 # Confirmation message
-Write-Host "Token and API endpoint saved to $tokenFilePath"
+Write-Host "Token and API endpoint saved to $tokenFilePath and environment variables set."
 ```
 
 ### Step 2: Bash Script for Loading Cached Token and API Endpoint

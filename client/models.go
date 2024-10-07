@@ -1,9 +1,10 @@
 package client
 
+// Space represents an IPAM space
 type Space struct {
-    ID          string `json:"id"`
-    Name        string `json:"name"`
-    Description string `json:"description"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type Block struct {
